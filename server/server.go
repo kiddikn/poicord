@@ -63,7 +63,7 @@ func (s *Server) LineHandler(c *gin.Context) {
 			continue
 		}
 
-		if event.Type != linebot.EventTypeMessage {
+		if event.Type == linebot.EventTypeMessage {
 			s.message(ctx, event)
 			continue
 		}
