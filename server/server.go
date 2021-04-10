@@ -60,7 +60,7 @@ func (s *Server) LineHandler(c *gin.Context) {
 	ctx := context.Background()
 
 	for _, event := range events {
-		if event.Type != linebot.EventTypeMessage {
+		if event.Type != linebot.EventTypeMessage && event.Type != linebot.EventTypePostback {
 			continue
 		}
 
@@ -93,8 +93,8 @@ func (s *Server) LineHandler(c *gin.Context) {
 			tem := linebot.NewButtonsTemplate(
 				"",
 				poicEnd,
-				"終わったら押してね",
-				linebot.NewPostbackAction("終了", "end", "", "終了"),
+				"ポイックウォーターが終わったら押してね",
+				linebot.NewPostbackAction("終わったよ", "poicend", "", "ポイックウォーター終了しました！がんばりました！"),
 			)
 			if _, err := s.bot.ReplyMessage(
 				event.ReplyToken,
