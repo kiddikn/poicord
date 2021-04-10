@@ -108,4 +108,5 @@ func (s *server) lineHandler(c *gin.Context) {
 			// 	}
 		}
 	}
+	c.JSON(http.StatusOK, nil)
 }
