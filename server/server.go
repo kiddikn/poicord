@@ -14,7 +14,7 @@ import (
 const (
 	help      = "ヘルプ"
 	poicStart = "本日のポイックウォーター開始"
-	poicEnd   = "終了"
+	poicEnd   = "ポイックウォーター終了しました！がんばりました！"
 )
 
 type Server struct {
@@ -83,16 +83,12 @@ func (s *Server) LineHandler(c *gin.Context) {
 			s.replyMessage(
 				ctx,
 				event.ReplyToken,
-				fmt.Sprintf("以下のメッセージから始まる文章に反応します。\n・"+poicStart+"\n・"+poicEnd),
+				fmt.Sprintf("以下のメッセージから始まる文章に反応します。\n・"+poicStart),
 			)
 		} else if strings.HasPrefix(msg, poicStart) {
-			s.replyMessage(ctx, event.ReplyToken, "ええやん！！がんばれ！！")
-		} else if strings.HasPrefix(msg, poicEnd) {
-			s.replyMessageWithSticker(ctx, event.ReplyToken, "お疲れ様ーー", "6136", "10551378")
-		} else if msg == "クイック" {
 			tem := linebot.NewButtonsTemplate(
 				"",
-				poicEnd,
+				"ポイックウォータ終了",
 				"ポイックウォーターが終わったら押してね",
 				linebot.NewPostbackAction("終わったよ", "poicend", "", "ポイックウォーター終了しました！がんばりました！"),
 			)
@@ -102,6 +98,8 @@ func (s *Server) LineHandler(c *gin.Context) {
 				linebot.NewTemplateMessage("ポイックウォーター終了", tem)).WithContext(ctx).Do(); err != nil {
 				log.Print(err)
 			}
+		} else if strings.HasPrefix(msg, poicEnd) {
+			s.replyMessageWithSticker(ctx, event.ReplyToken, "お疲れ様ーー", "6136", "10551378")
 		}
 	}
 	c.JSON(http.StatusOK, nil)
