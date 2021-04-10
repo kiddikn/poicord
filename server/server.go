@@ -41,9 +41,7 @@ func (s *Server) HealthHandler(c *gin.Context) {
 }
 
 func (s *Server) LineHandler(c *gin.Context) {
-	r := c.Request
-
-	events, err := s.bot.ParseRequest(r)
+	events, err := s.bot.ParseRequest(c.Request)
 	if err != nil {
 		if err == linebot.ErrInvalidSignature {
 			c.JSON(http.StatusBadRequest, gin.H{
@@ -60,61 +58,68 @@ func (s *Server) LineHandler(c *gin.Context) {
 	ctx := context.Background()
 
 	for _, event := range events {
-		if event.Type != linebot.EventTypeMessage && event.Type != linebot.EventTypePostback {
+		if event.Type == linebot.EventTypePostback {
+			s.postback(ctx, event)
 			continue
 		}
 
-		var msg string
-		switch message := event.Message.(type) {
-		case *linebot.TextMessage:
-			msg = message.Text
-		default:
+		if event.Type != linebot.EventTypeMessage {
+			s.message(ctx, event)
 			continue
-		}
-		// case *linebot.StickerMessage:
-		// 	replyMessage := fmt.Sprintf(
-		// 		"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
-		// 	if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
-		// 		log.Print(err)
-		// 	}
-
-		// メッセージによって処理を変更する
-		if msg == help {
-			s.replyMessage(
-				ctx,
-				event.ReplyToken,
-				fmt.Sprintf("以下のメッセージから始まる文章に反応します。\n・"+poicStart),
-			)
-		} else if strings.HasPrefix(msg, poicStart) {
-			tem := linebot.NewButtonsTemplate(
-				"",
-				"ポイックウォータ終了",
-				"ポイックウォーターが終わったら押してね",
-				linebot.NewPostbackAction("終わったよ", "poicend", "", "ポイックウォーター終了しました！がんばりました！"),
-			)
-			if _, err := s.bot.ReplyMessage(
-				event.ReplyToken,
-				linebot.NewTextMessage("ええやん！！がんばれ！！"),
-				linebot.NewTemplateMessage("ポイックウォーター終了", tem)).WithContext(ctx).Do(); err != nil {
-				log.Print(err)
-			}
-		} else if strings.HasPrefix(msg, poicEnd) {
-			s.replyMessageWithSticker(ctx, event.ReplyToken, "お疲れ様ーー", "6136", "10551378")
 		}
 	}
 	c.JSON(http.StatusOK, nil)
 }
 
-func (s *Server) replyMessage(ctx context.Context, replyToken, reply string) {
-	if _, err := s.bot.ReplyMessage(replyToken, linebot.NewTextMessage(reply)).WithContext(ctx).Do(); err != nil {
-		log.Print(err)
+func (s *Server) message(ctx context.Context, e *linebot.Event) {
+	var msg string
+	switch message := e.Message.(type) {
+	case *linebot.TextMessage:
+		msg = message.Text
+	default:
+		return
+	}
+	// case *linebot.StickerMessage:
+	// 	replyMessage := fmt.Sprintf(
+	// 		"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
+	// 	if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
+	// 		log.Print(err)
+	// 	}
+
+	// メッセージによって処理を変更する
+	if msg == help {
+		if _, err := s.bot.ReplyMessage(
+			e.ReplyToken,
+			linebot.NewTextMessage(fmt.Sprintf("以下のメッセージから始まる文章に反応します。\n・"+poicStart)),
+		).WithContext(ctx).Do(); err != nil {
+			log.Print(err)
+		}
+	} else if strings.HasPrefix(msg, poicStart) {
+		// 開始に対応するメッセージは打たなくても良いようにボタンテンプレートを返す
+		t := linebot.NewButtonsTemplate(
+			"",
+			"ポイックウォーター終了",
+			"ポイックウォーターが終わったら押してね",
+			linebot.NewPostbackAction("終わったよ", "poicend", "", "ポイックウォーター終了しました！がんばりました！"),
+		)
+		if _, err := s.bot.ReplyMessage(
+			e.ReplyToken,
+			linebot.NewTextMessage("ええやん！！がんばれ！！"),
+			linebot.NewTemplateMessage("ポイックウォーター終了", t)).WithContext(ctx).Do(); err != nil {
+			log.Print(err)
+		}
 	}
 }
 
-func (s *Server) replyMessageWithSticker(ctx context.Context, replyToken, reply, packageID, stickerID string) {
+func (s *Server) postback(ctx context.Context, e *linebot.Event) {
+	const (
+		packageID = "6136" // 謝罪のプロ！LINEキャラクターズ
+		stickerID = "10551378"
+	)
+
 	if _, err := s.bot.ReplyMessage(
-		replyToken,
-		linebot.NewTextMessage(reply),
+		e.ReplyToken,
+		linebot.NewTextMessage("お疲れ様ーー"),
 		&linebot.StickerMessage{
 			PackageID: packageID,
 			StickerID: stickerID,
