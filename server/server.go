@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -56,6 +57,8 @@ func (s *Server) LineHandler(c *gin.Context) {
 		return
 	}
 
+	ctx := context.Background()
+
 	for _, event := range events {
 		if event.Type != linebot.EventTypeMessage {
 			continue
@@ -75,36 +78,50 @@ func (s *Server) LineHandler(c *gin.Context) {
 		// 		log.Print(err)
 		// 	}
 
+		// メッセージによって処理を変更する
 		if msg == help {
 			s.replyMessage(
+				ctx,
 				event.ReplyToken,
 				fmt.Sprintf("以下のメッセージから始まる文章に反応します。\n・"+poicStart+"\n・"+poicEnd),
 			)
 		} else if strings.HasPrefix(msg, poicStart) {
-			s.replyMessage(event.ReplyToken, "頑張って行こうね")
+			s.replyMessage(ctx, event.ReplyToken, "ええやん！！がんばれ！！")
 		} else if strings.HasPrefix(msg, poicEnd) {
-			s.replyMessageWithSticker(event.ReplyToken, "お疲れ様ーー")
+			s.replyMessageWithSticker(ctx, event.ReplyToken, "お疲れ様ーー", "6136", "10551378")
+		} else if msg == "クイック" {
+			tem := linebot.NewButtonsTemplate(
+				"",
+				poicEnd,
+				"終わったら押してね",
+				linebot.NewPostbackAction("終了", "", "終了", "終了"),
+			)
+			if _, err := s.bot.ReplyMessage(
+				event.ReplyToken,
+				linebot.NewTextMessage("ええやん！！がんばれ！！"),
+				linebot.NewTemplateMessage("ポイックウォーター終了", tem)).WithContext(ctx).Do(); err != nil {
+				log.Print(err)
+			}
 		}
-
 	}
 	c.JSON(http.StatusOK, nil)
 }
 
-func (s *Server) replyMessage(replyToken, reply string) {
-	if _, err := s.bot.ReplyMessage(replyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
+func (s *Server) replyMessage(ctx context.Context, replyToken, reply string) {
+	if _, err := s.bot.ReplyMessage(replyToken, linebot.NewTextMessage(reply)).WithContext(ctx).Do(); err != nil {
 		log.Print(err)
 	}
 }
 
-func (s *Server) replyMessageWithSticker(replyToken, reply string) {
+func (s *Server) replyMessageWithSticker(ctx context.Context, replyToken, reply, packageID, stickerID string) {
 	if _, err := s.bot.ReplyMessage(
 		replyToken,
 		linebot.NewTextMessage(reply),
 		&linebot.StickerMessage{
-			PackageID: "6136",
-			StickerID: "10551378",
+			PackageID: packageID,
+			StickerID: stickerID,
 		},
-	).Do(); err != nil {
+	).WithContext(ctx).Do(); err != nil {
 		log.Print(err)
 	}
 }
