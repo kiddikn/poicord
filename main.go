@@ -38,7 +38,7 @@ func main() {
 	router.GET("/health", func(c *gin.Context) {
 		server.healthHandler(c)
 	})
-	router.GET("/v1/callback", func(c *gin.Context) {
+	router.POST("/v1/callback", func(c *gin.Context) {
 		server.lineHandler(c)
 	})
 
