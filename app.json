@@ -1,0 +1,10 @@
+{
+  "name": "poicwater recorder: Go",
+  "description": "Record poic water habits",
+  "keywords": [
+    "poic water",
+    "go"
+  ],
+  "website": "http://github.com/heroku/poicord",
+  "repository": "http://github.com/heroku/poicord"
+}
