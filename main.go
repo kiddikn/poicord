@@ -95,7 +95,7 @@ func (s *server) lineHandler(c *gin.Context) {
 		case *linebot.TextMessage:
 			replyMessage := message.Text
 			if replyMessage == "ヘルプ" {
-				replyMessage = fmt.Sprintf("まずは返信できるかなを確認するね")
+				replyMessage = fmt.Sprintf("まずは返信できるかを確認するね")
 			}
 			if _, err = s.bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
 				log.Print(err)
