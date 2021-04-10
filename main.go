@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
@@ -93,11 +95,13 @@ func (s *server) lineHandler(c *gin.Context) {
 
 		switch message := event.Message.(type) {
 		case *linebot.TextMessage:
-			replyMessage := message.Text
-			if replyMessage == "ヘルプ" {
-				replyMessage = fmt.Sprintf("まずは返信できるかを確認するね")
+			rep, err := getReplyMsg(message.Text)
+			if err != nil {
+				// いったん無視
+				continue
 			}
-			if _, err = s.bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
+
+			if _, err = s.bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(rep)).Do(); err != nil {
 				log.Print(err)
 			}
 			// case *linebot.StickerMessage:
@@ -109,4 +113,25 @@ func (s *server) lineHandler(c *gin.Context) {
 		}
 	}
 	c.JSON(http.StatusOK, nil)
+}
+
+func getReplyMsg(msg string) (string, error) {
+
+	const (
+		poicStart = "本日のポイックウォーター開始"
+		poicEnd   = "終了"
+	)
+
+	if msg == "ヘルプ" {
+		return fmt.Sprintf("まずは返信できるかを確認するね"), nil
+	}
+
+	if strings.HasPrefix(msg, poicStart) {
+		return fmt.Sprintf("頑張って行こうね"), nil
+	}
+
+	if strings.HasPrefix(msg, poicEnd) {
+		return fmt.Sprintf("お疲れ様でした"), nil
+	}
+	return "", errors.New("nothing to do")
 }
