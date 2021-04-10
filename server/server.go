@@ -94,7 +94,7 @@ func (s *Server) LineHandler(c *gin.Context) {
 				"",
 				poicEnd,
 				"終わったら押してね",
-				linebot.NewPostbackAction("終了", "", "", "終了"),
+				linebot.NewPostbackAction("終了", "end", "", "終了"),
 			)
 			if _, err := s.bot.ReplyMessage(
 				event.ReplyToken,
