@@ -100,10 +100,10 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 		// 開始のDB接続
 		p := poicwater.NewPoicWater(e.Source.UserID)
 		log.Print(p)
-		if err := s.r.Create(p); err != nil {
-			log.Print("レコードの作成大失敗")
-			log.Print(err)
-		}
+		// if err := s.r.Create(p); err != nil {
+		// 	log.Print("レコードの作成大失敗")
+		// 	log.Print(err)
+		// }
 
 		// 開始に対応するメッセージは打たなくても良いようにボタンテンプレートを返す
 		t := linebot.NewButtonsTemplate(
