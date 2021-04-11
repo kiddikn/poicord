@@ -131,7 +131,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 
 func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	// 終了処理を実施
-	id, err := s.r.Finish("test")
+	id, err := s.r.Finish(e.Source.UserID)
 	if err != nil {
 		log.Print("レコードの終了処理の大失敗")
 		log.Print(err)

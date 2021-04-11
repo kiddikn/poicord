@@ -59,15 +59,15 @@ func main() {
 	router.GET("/getall", func(c *gin.Context) {
 		server.GetHandler(c)
 	})
-	router.GET("/create", func(c *gin.Context) {
-		server.CreateHandler(c)
-	})
-	router.GET("/revokeever", func(c *gin.Context) {
-		server.RevokeEverHandler(c)
-	})
-	router.GET("/fin", func(c *gin.Context) {
-		server.FinishHandler(c)
-	})
+	// router.GET("/create", func(c *gin.Context) {
+	// 	server.CreateHandler(c)
+	// })
+	// router.GET("/revokeever", func(c *gin.Context) {
+	// 	server.RevokeEverHandler(c)
+	// })
+	// router.GET("/fin", func(c *gin.Context) {
+	// 	server.FinishHandler(c)
+	// })
 
 	log.Print("http://localhost:" + port)
 	router.Run(":" + port)
