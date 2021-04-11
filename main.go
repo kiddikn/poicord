@@ -54,8 +54,19 @@ func main() {
 	router.POST("/v1/callback", func(c *gin.Context) {
 		server.LineHandler(c)
 	})
-	router.GET("/get", func(c *gin.Context) {
+
+	// test用
+	router.GET("/getall", func(c *gin.Context) {
 		server.GetHandler(c)
+	})
+	router.GET("/create", func(c *gin.Context) {
+		server.CreateHandler(c)
+	})
+	router.GET("/revokeever", func(c *gin.Context) {
+		server.RevokeEverHandler(c)
+	})
+	router.GET("/fin", func(c *gin.Context) {
+		server.FinishHandler(c)
 	})
 
 	log.Print("http://localhost:" + port)

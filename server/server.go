@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/hako/durafmt"
 	"github.com/kiddikn/poicord/poicwater"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
@@ -33,6 +35,7 @@ func NewServer(channelSecret, channelToken string, r PoicWaterRepository) (*Serv
 	}
 	return &Server{
 		bot: bot,
+		r:   r,
 	}, nil
 }
 
@@ -97,13 +100,18 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 			log.Print(err)
 		}
 	} else if strings.HasPrefix(msg, poicStart) {
-		// 開始のDB接続
+		// 既存データで終了していないデータはrevoke
+		if err := s.r.RevokeEver("test"); err != nil {
+			log.Print("レコードのrevoke大失敗")
+			log.Print(err)
+		}
+
+		// 最新の開始のみデータを残す
 		p := poicwater.NewPoicWater(e.Source.UserID)
-		log.Print(fmt.Printf("(%%+v) %+v", p))
-		// if err := s.r.Create(p); err != nil {
-		// 	log.Print("レコードの作成大失敗")
-		// 	log.Print(err)
-		// }
+		if err := s.r.Create(p); err != nil {
+			log.Print("レコードの作成大失敗")
+			log.Print(err)
+		}
 
 		// 開始に対応するメッセージは打たなくても良いようにボタンテンプレートを返す
 		t := linebot.NewButtonsTemplate(
@@ -122,6 +130,32 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 }
 
 func (s *Server) postback(ctx context.Context, e *linebot.Event) {
+	// 終了処理を実施
+	id, err := s.r.Finish("test")
+	if err != nil {
+		log.Print("レコードの終了処理の大失敗")
+		log.Print(err)
+		return
+	}
+
+	if id == 0 {
+		log.Print("ポイックウォーターの終了失敗")
+		return
+	}
+
+	// 終了したポイックウォーターを取得する
+	p, err := s.r.GetByID(id)
+	if err != nil {
+		log.Print("ポイックウォーターの取得失敗:" + strconv.FormatUint(uint64(id), 10))
+		log.Print(err)
+		return
+	}
+
+	// 時間差を計算
+	diff := p.FinishedAt.Time.Sub(p.StartedAt)
+	duration := durafmt.Parse(diff).String()
+
+	// LINE通知
 	const (
 		packageID = "6136" // 謝罪のプロ！LINEキャラクターズ
 		stickerID = "10551394"
@@ -129,7 +163,7 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 
 	if _, err := s.bot.ReplyMessage(
 		e.ReplyToken,
-		linebot.NewTextMessage("お疲れ様ーー"),
+		linebot.NewTextMessage("お疲れ様でした。\n所要時間は"+duration+"です。"),
 		&linebot.StickerMessage{
 			PackageID: packageID,
 			StickerID: stickerID,
@@ -137,21 +171,62 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	).WithContext(ctx).Do(); err != nil {
 		log.Print(err)
 	}
-
-	// p, err := s.r.Get()
-	// if err != nil {
-	// 	log.Print("レコードの取得大失敗")
-	// 	return
-	// }
-	// log.Print(p)
 }
 
 func (s *Server) GetHandler(c *gin.Context) {
-	p, err := s.r.Get()
+	defer c.JSON(http.StatusOK, nil)
+
+	p, err := s.r.BatchGet()
 	if err != nil {
 		log.Print("レコードの取得大失敗")
 		return
 	}
 	log.Print(p)
-	c.JSON(http.StatusOK, nil)
+}
+
+func (s *Server) CreateHandler(c *gin.Context) {
+	defer c.JSON(http.StatusOK, nil)
+
+	p := poicwater.NewPoicWater("test")
+	if err := s.r.Create(p); err != nil {
+		log.Print("レコードの作成大失敗")
+		log.Print(err)
+		return
+	}
+}
+
+func (s *Server) RevokeEverHandler(c *gin.Context) {
+	defer c.JSON(http.StatusOK, nil)
+
+	if err := s.r.RevokeEver("test"); err != nil {
+		log.Print("レコードのrevoke大失敗")
+		log.Print(err)
+		return
+	}
+}
+
+func (s *Server) FinishHandler(c *gin.Context) {
+	defer c.JSON(http.StatusOK, nil)
+
+	id, err := s.r.Finish("test")
+	if err != nil {
+		log.Print("レコードの終了処理の大失敗")
+		log.Print(err)
+		return
+	}
+
+	if id == 0 {
+		return
+	}
+
+	p, err := s.r.GetByID(id)
+	if err != nil {
+		log.Print("ポイックウォーターの取得失敗:" + strconv.FormatUint(uint64(id), 10))
+		log.Print(err)
+		return
+	}
+
+	diff := p.FinishedAt.Time.Sub(p.StartedAt)
+	duration := durafmt.Parse(diff).String()
+	log.Print("お疲れ様でした。\n所要時間は" + duration + "です。")
 }
