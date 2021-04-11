@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
+	"github.com/jinzhu/gorm"
 	"github.com/kiddikn/poicord/poicwater"
 	"github.com/kiddikn/poicord/server"
 )
@@ -31,10 +32,13 @@ func main() {
 		log.Fatal("database url must be set")
 	}
 
-	r, err := poicwater.NewPoicWaterRepository(dbu)
+	db, err := gorm.Open("postgres", dbu)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("db connection error")
 	}
+	defer db.Close()
+
+	r := poicwater.NewPoicWaterRepository(db)
 
 	server, err := server.NewServer(lcs, lat, r)
 	if err != nil {
@@ -49,6 +53,9 @@ func main() {
 	})
 	router.POST("/v1/callback", func(c *gin.Context) {
 		server.LineHandler(c)
+	})
+	router.GET("/get", func(c *gin.Context) {
+		server.GetHandler(c)
 	})
 
 	log.Print("http://localhost:" + port)

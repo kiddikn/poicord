@@ -11,14 +11,10 @@ type PoicWaterRepository struct {
 	db *gorm.DB
 }
 
-func NewPoicWaterRepository(dsn string) (*PoicWaterRepository, error) {
-	db, err := gorm.Open("postgres", dsn)
-	if err != nil {
-		return nil, err
-	}
+func NewPoicWaterRepository(db *gorm.DB) *PoicWaterRepository {
 	return &PoicWaterRepository{
 		db: db,
-	}, nil
+	}
 }
 
 func (r *PoicWaterRepository) Create(p *PoicWater) error {

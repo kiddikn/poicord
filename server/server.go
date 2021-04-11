@@ -145,3 +145,13 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	// }
 	// log.Print(p)
 }
+
+func (s *Server) GetHandler(c *gin.Context) {
+	p, err := s.r.Get()
+	if err != nil {
+		log.Print("レコードの取得大失敗")
+		return
+	}
+	log.Print(p)
+	c.JSON(http.StatusOK, nil)
+}
