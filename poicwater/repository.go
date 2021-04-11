@@ -1,8 +1,6 @@
 package poicwater
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -22,13 +20,6 @@ func NewPoicWaterRepository(dsn string) (*PoicWaterRepository, error) {
 }
 
 func (r *PoicWaterRepository) Create(p *PoicWater) error {
-	defer func() {
-		err := recover()
-		if err != nil {
-			fmt.Println("Recover!:", err)
-		}
-	}()
-
 	db := r.db.Create(p)
 	if db.Error != nil {
 		return db.Error
