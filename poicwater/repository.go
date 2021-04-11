@@ -26,3 +26,12 @@ func (r *PoicWaterRepository) Create(p *PoicWater) error {
 	}
 	return nil
 }
+
+func (r *PoicWaterRepository) Get() ([]*PoicWater, error) {
+	var poicwater []*PoicWater
+	db := r.db.Find(&poicwater)
+	if db.Error != nil {
+		return nil, db.Error
+	}
+	return poicwater, nil
+}

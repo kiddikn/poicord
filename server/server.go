@@ -137,4 +137,11 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	).WithContext(ctx).Do(); err != nil {
 		log.Print(err)
 	}
+
+	p, err := s.r.Get()
+	if err != nil {
+		log.Print("レコードの取得大失敗")
+		return
+	}
+	log.Print(p)
 }
