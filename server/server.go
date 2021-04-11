@@ -124,7 +124,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	const (
 		packageID = "6136" // 謝罪のプロ！LINEキャラクターズ
-		stickerID = "10551378"
+		stickerID = "10551394"
 	)
 
 	if _, err := s.bot.ReplyMessage(
@@ -138,10 +138,10 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 		log.Print(err)
 	}
 
-	p, err := s.r.Get()
-	if err != nil {
-		log.Print("レコードの取得大失敗")
-		return
-	}
-	log.Print(p)
+	// p, err := s.r.Get()
+	// if err != nil {
+	// 	log.Print("レコードの取得大失敗")
+	// 	return
+	// }
+	// log.Print(p)
 }
