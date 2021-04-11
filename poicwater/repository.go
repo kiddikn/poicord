@@ -1,6 +1,8 @@
 package poicwater
 
 import (
+	"fmt"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -28,10 +30,14 @@ func (r *PoicWaterRepository) Create(p *PoicWater) error {
 }
 
 func (r *PoicWaterRepository) Get() ([]PoicWater, error) {
-	var poicwater []PoicWater
-	db := r.db.Find(&poicwater)
+	var p []PoicWater
+	db := r.db.Find(&p)
+
+	fmt.Println("結果")
+	fmt.Println(p)
+
 	if db.Error != nil {
 		return nil, db.Error
 	}
-	return poicwater, nil
+	return p, nil
 }
