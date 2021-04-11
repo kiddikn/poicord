@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/heroku/x/hmetrics/onload"
+	"github.com/kiddikn/poicord/poicwater"
 	"github.com/kiddikn/poicord/server"
 )
 
@@ -25,7 +26,17 @@ func main() {
 		log.Fatal("line access token must be set")
 	}
 
-	server, err := server.NewServer(lcs, lat)
+	dbu := os.Getenv("DATABASE_URL")
+	if dbu == "" {
+		log.Fatal("database url must be set")
+	}
+
+	r, err := poicwater.NewPoicWaterRepository(dbu)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	server, err := server.NewServer(lcs, lat, r)
 	if err != nil {
 		log.Fatal("initialize new server is failed")
 	}

@@ -19,9 +19,10 @@ const (
 
 type Server struct {
 	bot *linebot.Client
+	r   PoicWaterRepository
 }
 
-func NewServer(channelSecret, channelToken string) (*Server, error) {
+func NewServer(channelSecret, channelToken string, r PoicWaterRepository) (*Server, error) {
 	bot, err := linebot.New(
 		channelSecret,
 		channelToken,
