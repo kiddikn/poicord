@@ -17,3 +17,7 @@ func NewPoicWater(userID string) *PoicWater {
 		StartedAt: time.Now(),
 	}
 }
+
+func (p *PoicWater) TableName() string {
+	return "poic_water"
+}
