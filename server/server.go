@@ -99,7 +99,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 	} else if strings.HasPrefix(msg, poicStart) {
 		// 開始のDB接続
 		p := poicwater.NewPoicWater(e.Source.UserID)
-		log.Print(p)
+		log.Print(fmt.Printf("(%%+v) %+v", p))
 		// if err := s.r.Create(p); err != nil {
 		// 	log.Print("レコードの作成大失敗")
 		// 	log.Print(err)
