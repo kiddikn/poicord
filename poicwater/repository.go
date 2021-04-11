@@ -6,7 +6,10 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/pkg/errors"
 )
+
+var ErrRecordNotFound = errors.New("record not found")
 
 type PoicWaterRepository struct {
 	db *gorm.DB
@@ -63,6 +66,9 @@ func (r *PoicWaterRepository) Finish(userID string) (uint, error) {
 	db := r.db.First(&p, "user_id=? and finished_at is null and revoked_at is null", userID)
 
 	if db.Error != nil {
+		if errors.Is(db.Error, gorm.ErrRecordNotFound) {
+			return 0, ErrRecordNotFound
+		}
 		return 0, db.Error
 	}
 

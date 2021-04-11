@@ -12,6 +12,7 @@ import (
 	"github.com/hako/durafmt"
 	"github.com/kiddikn/poicord/poicwater"
 	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -133,6 +134,16 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	// 終了処理を実施
 	id, err := s.r.Finish(e.Source.UserID)
 	if err != nil {
+		if errors.Is(err, poicwater.ErrRecordNotFound) {
+			log.Print("開始レコードがありません")
+			if _, err := s.bot.ReplyMessage(
+				e.ReplyToken,
+				linebot.NewTextMessage("開始してますか？計算が開始できませんでした..."),
+			).WithContext(ctx).Do(); err != nil {
+				log.Print(err)
+			}
+			return
+		}
 		log.Print("レコードの終了処理の大失敗")
 		log.Print(err)
 		return
@@ -210,6 +221,10 @@ func (s *Server) FinishHandler(c *gin.Context) {
 
 	id, err := s.r.Finish("test")
 	if err != nil {
+		if errors.Is(err, poicwater.ErrRecordNotFound) {
+			log.Print("開始レコードがありませんでした")
+			return
+		}
 		log.Print("レコードの終了処理の大失敗")
 		log.Print(err)
 		return
