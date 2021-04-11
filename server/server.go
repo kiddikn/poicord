@@ -74,13 +74,6 @@ func (s *Server) LineHandler(c *gin.Context) {
 }
 
 func (s *Server) message(ctx context.Context, e *linebot.Event) {
-	defer func() {
-		err := recover()
-		if err != nil {
-			fmt.Println("Recover!:", err)
-		}
-	}()
-
 	var msg string
 	switch message := e.Message.(type) {
 	case *linebot.TextMessage:
