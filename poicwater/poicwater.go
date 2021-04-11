@@ -11,14 +11,9 @@ type PoicWater struct {
 	CreatedAt   time.Time `gorm:"-"`
 }
 
-// type User struct {
-// 	ID           uint
-// 	Name         string
-// 	Email        *string
-// 	Age          uint8
-// 	Birthday     *time.Time
-// 	MemberNumber sql.NullString
-// 	ActivatedAt  sql.NullTime
-// 	CreatedAt    time.Time
-// 	UpdatedAt    time.Time
-//   }
+func NewPoicWater(userID string) *PoicWater {
+	return &PoicWater{
+		UserID:    userID,
+		StartedAt: time.Now(),
+	}
+}

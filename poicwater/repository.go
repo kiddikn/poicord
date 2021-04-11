@@ -18,3 +18,11 @@ func NewPoicWaterRepository(dsn string) (*PoicWaterRepository, error) {
 		db: db,
 	}, nil
 }
+
+func (r *PoicWaterRepository) Create(p *PoicWater) error {
+	db := r.db.Create(p)
+	if db.Error != nil {
+		return db.Error
+	}
+	return nil
+}

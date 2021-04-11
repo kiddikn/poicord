@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/kiddikn/poicord/poicwater"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
@@ -96,6 +97,13 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 			log.Print(err)
 		}
 	} else if strings.HasPrefix(msg, poicStart) {
+		// 開始のDB接続
+		p := poicwater.NewPoicWater(e.Source.UserID)
+		if err := s.r.Create(p); err != nil {
+			log.Print("レコードの作成大失敗")
+			log.Print(err)
+		}
+
 		// 開始に対応するメッセージは打たなくても良いようにボタンテンプレートを返す
 		t := linebot.NewButtonsTemplate(
 			"",
