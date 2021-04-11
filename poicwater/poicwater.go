@@ -1,14 +1,18 @@
 package poicwater
 
-import "time"
+import (
+	"time"
+
+	"github.com/jinzhu/gorm"
+)
 
 type PoicWater struct {
-	ID         uint `gorm:"primary_key"`
+	gorm.Model
+
 	UserID     string
 	StartedAt  time.Time
 	FinishedAt time.Time
 	RevokedAt  time.Time
-	CreatedAt  time.Time `gorm:"-"`
 }
 
 func NewPoicWater(userID string) *PoicWater {
