@@ -31,7 +31,7 @@ func main() {
 		log.Fatal("database url must be set")
 	}
 
-	r, err := poicwater.NewPoicWaterRepository("host=ec2-54-145-102-149.compute-1.amazonaws.com:5432 user=yzhligxpsnczcx dbname=d81hku2triopmn sslmode=disable password=11f7bb65e9c1ef1629acfefdc27745502aeca6494273eaa2f5527799550b8d2e")
+	r, err := poicwater.NewPoicWaterRepository("host=ec2-54-145-102-149.compute-1.amazonaws.com port=5432 user=yzhligxpsnczcx dbname=d81hku2triopmn sslmode=disable password=11f7bb65e9c1ef1629acfefdc27745502aeca6494273eaa2f5527799550b8d2e")
 	if err != nil {
 		log.Fatal(err)
 	}
