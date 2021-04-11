@@ -102,7 +102,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 		}
 	} else if strings.HasPrefix(msg, poicStart) {
 		// 既存データで終了していないデータはrevoke
-		if err := s.r.RevokeEver("test"); err != nil {
+		if err := s.r.RevokeEver(e.Source.UserID); err != nil {
 			log.Print("レコードのrevoke大失敗")
 			log.Print(err)
 		}
