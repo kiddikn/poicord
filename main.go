@@ -9,6 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/kiddikn/poicord/poicwater"
 	"github.com/kiddikn/poicord/server"
+	"github.com/kiddikn/poicord/sticker"
 )
 
 func main() {
@@ -40,7 +41,9 @@ func main() {
 
 	r := poicwater.NewPoicWaterRepository(db)
 
-	server, err := server.NewServer(lcs, lat, r)
+	s := sticker.NewStickerSelector()
+
+	server, err := server.NewServer(lcs, lat, r, s)
 	if err != nil {
 		log.Fatal("initialize new server is failed")
 	}

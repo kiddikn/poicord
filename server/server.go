@@ -24,9 +24,10 @@ const (
 type Server struct {
 	bot *linebot.Client
 	r   PoicWaterRepository
+	s   Sticker
 }
 
-func NewServer(channelSecret, channelToken string, r PoicWaterRepository) (*Server, error) {
+func NewServer(channelSecret, channelToken string, r PoicWaterRepository, s Sticker) (*Server, error) {
 	bot, err := linebot.New(
 		channelSecret,
 		channelToken,
@@ -37,6 +38,7 @@ func NewServer(channelSecret, channelToken string, r PoicWaterRepository) (*Serv
 	return &Server{
 		bot: bot,
 		r:   r,
+		s:   s,
 	}, nil
 }
 
@@ -161,17 +163,13 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	duration := durafmt.Parse(diff).String()
 
 	// LINE通知
-	const (
-		packageID = "6136" // 謝罪のプロ！LINEキャラクターズ
-		stickerID = "10551394"
-	)
-
+	st := s.s.GetRandomSticker()
 	if _, err := s.bot.ReplyMessage(
 		e.ReplyToken,
 		linebot.NewTextMessage("お疲れ様でした。\n所要時間は"+duration+"です。"),
 		&linebot.StickerMessage{
-			PackageID: packageID,
-			StickerID: stickerID,
+			PackageID: st.PackageID,
+			StickerID: st.StickerID,
 		},
 	).WithContext(ctx).Do(); err != nil {
 		log.Print(err)
