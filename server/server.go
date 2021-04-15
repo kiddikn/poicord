@@ -17,8 +17,8 @@ import (
 
 const (
 	help      = "ヘルプ"
-	poicStart = "本日のポイックウォーター開始"
-	poicEnd   = "ポイックウォーター終了しました！がんばりました！"
+	poicStart = "いでよ歯磨きの精"
+	poicEnd   = "歯磨き終了しました！がんばりました！"
 )
 
 type Server struct {
@@ -85,12 +85,6 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 	default:
 		return
 	}
-	// case *linebot.StickerMessage:
-	// 	replyMessage := fmt.Sprintf(
-	// 		"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
-	// 	if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
-	// 		log.Print(err)
-	// 	}
 
 	// メッセージによって処理を変更する
 	if msg == help {
@@ -117,14 +111,14 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 		// 開始に対応するメッセージは打たなくても良いようにボタンテンプレートを返す
 		t := linebot.NewButtonsTemplate(
 			"",
-			"ポイックウォーター終了",
-			"ポイックウォーターが終わったら押してね",
-			linebot.NewPostbackAction("終わったよ", "poicend", "", "ポイックウォーター終了しました！がんばりました！"),
+			"歯磨き終了",
+			"歯磨きが終わったら押してね",
+			linebot.NewPostbackAction("終わったよ", "poicend", "", poicEnd),
 		)
 		if _, err := s.bot.ReplyMessage(
 			e.ReplyToken,
 			linebot.NewTextMessage("ええやん！！がんばれ！！"),
-			linebot.NewTemplateMessage("ポイックウォーター終了", t)).WithContext(ctx).Do(); err != nil {
+			linebot.NewTemplateMessage("歯磨き終了", t)).WithContext(ctx).Do(); err != nil {
 			log.Print(err)
 		}
 	}
@@ -150,14 +144,14 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 	}
 
 	if id == 0 {
-		log.Print("ポイックウォーターの終了失敗")
+		log.Print("歯磨きの終了失敗")
 		return
 	}
 
 	// 終了したポイックウォーターを取得する
 	p, err := s.r.GetByID(id)
 	if err != nil {
-		log.Print("ポイックウォーターの取得失敗:" + strconv.FormatUint(uint64(id), 10))
+		log.Print("歯磨き開始の取得失敗:" + strconv.FormatUint(uint64(id), 10))
 		log.Print(err)
 		return
 	}
