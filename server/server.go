@@ -22,9 +22,10 @@ const (
 )
 
 type Server struct {
-	bot *linebot.Client
-	r   PoicWaterRepository
-	s   Sticker
+	bot   *linebot.Client
+	r     PoicWaterRepository
+	s     Sticker
+	units durafmt.Units
 }
 
 func NewServer(channelSecret, channelToken string, r PoicWaterRepository, s Sticker) (*Server, error) {
@@ -35,10 +36,17 @@ func NewServer(channelSecret, channelToken string, r PoicWaterRepository, s Stic
 	if err != nil {
 		return nil, err
 	}
+
+	units, err := durafmt.DefaultUnitsCoder.Decode("年:年,週:週,日:日,時間:時間,分:分,秒:秒,ミリ秒:ミリ秒,マイクロ秒:マイクロ秒")
+	if err != nil {
+		return nil, err
+	}
+
 	return &Server{
-		bot: bot,
-		r:   r,
-		s:   s,
+		bot:   bot,
+		r:     r,
+		s:     s,
+		units: units,
 	}, nil
 }
 
@@ -160,7 +168,7 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 
 	// 時間差を計算
 	diff := p.FinishedAt.Time.Sub(p.StartedAt)
-	duration := durafmt.Parse(diff).String()
+	duration := durafmt.Parse(diff).LimitFirstN(3).Format(s.units)
 
 	// LINE通知
 	st := s.s.GetRandomSticker()
