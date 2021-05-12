@@ -168,7 +168,7 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 
 	// 時間差を計算
 	diff := p.FinishedAt.Time.Sub(p.StartedAt)
-	duration := durafmt.Parse(diff).LimitFirstN(3).Format(s.units)
+	duration := durafmt.Parse(diff).LimitFirstN(2).Format(s.units)
 
 	// LINE通知
 	st := s.s.GetRandomSticker()
