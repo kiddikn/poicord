@@ -59,9 +59,9 @@ func main() {
 	})
 
 	// test用
-	router.GET("/getall", func(c *gin.Context) {
-		server.GetHandler(c)
-	})
+	// router.GET("/getall", func(c *gin.Context) {
+	// 	server.GetHandler(c)
+	// })
 	// router.GET("/create", func(c *gin.Context) {
 	// 	server.CreateHandler(c)
 	// })

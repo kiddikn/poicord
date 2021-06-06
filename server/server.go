@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/hako/durafmt"
@@ -17,7 +18,7 @@ import (
 
 const (
 	help      = "ヘルプ"
-	poicStart = "いでよ歯磨きの精"
+	poicStart = "いでよ"
 	poicEnd   = "歯磨き終了しました！がんばりました！"
 )
 
@@ -127,7 +128,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 		)
 		if _, err := s.bot.ReplyMessage(
 			e.ReplyToken,
-			linebot.NewTextMessage("ええやん！！がんばれ！！"),
+			linebot.NewTextMessage("ええやん！！がんばれ！！いっぱい磨こうな^_^"),
 			linebot.NewTemplateMessage("歯磨き終了", t)).WithContext(ctx).Do(); err != nil {
 			log.Print(err)
 		}
@@ -172,9 +173,18 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 
 	// LINE通知
 	st := s.s.GetRandomSticker()
+	msg := "お疲れ様でした。\n所要時間は" + duration + "です。"
+	if diff < 10*time.Minute {
+		msg += "\nサボり？？これが続くと怒っちゃうよ"
+	} else if diff < 15*time.Minute {
+		msg += "\nもう少し頑張って汚れを落とそうぜ！"
+	} else if diff >= 20*time.Minute {
+		msg += "\nよく頑張ってるね！いい子だいい子だ！"
+	}
+
 	if _, err := s.bot.ReplyMessage(
 		e.ReplyToken,
-		linebot.NewTextMessage("お疲れ様でした。\n所要時間は"+duration+"です。"),
+		linebot.NewTextMessage(msg),
 		&linebot.StickerMessage{
 			PackageID: st.PackageID,
 			StickerID: st.StickerID,
