@@ -128,7 +128,7 @@ func (s *Server) message(ctx context.Context, e *linebot.Event) {
 		)
 		if _, err := s.bot.ReplyMessage(
 			e.ReplyToken,
-			linebot.NewTextMessage("ええやん！！がんばれ！！いっぱい磨こうな^_^"),
+			linebot.NewTextMessage("いっぱい磨こうな^_^デンタルフロスは歯間を上下左右に丁寧にやるねんで！！"),
 			linebot.NewTemplateMessage("歯磨き終了", t)).WithContext(ctx).Do(); err != nil {
 			log.Print(err)
 		}
@@ -178,6 +178,10 @@ func (s *Server) postback(ctx context.Context, e *linebot.Event) {
 		msg += "\nサボり？？これが続くと怒っちゃうよ"
 	} else if diff < 15*time.Minute {
 		msg += "\nもう少し頑張って汚れを落とそうぜ！"
+	} else if diff >= 30*time.Minute {
+		msg += "\nやば！！まじ天才かよ！！"
+	} else if diff >= 25*time.Minute {
+		msg += "\nExcellent！！とってもいけてる！！"
 	} else if diff >= 20*time.Minute {
 		msg += "\nよく頑張ってるね！いい子だいい子だ！"
 	}
