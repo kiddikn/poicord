@@ -6,14 +6,5 @@ services:
     name: poicord
     env: docker # valid values: https://render.com/docs/yaml-spec#environment
     dockerfilePath: Dockerfile.render
-    plan: free # optional; defaults to starter
+    plan: free 
     numInstances: 1
-    envVars:
-      # - key: DATABASE_URL # Render PostgreSQL database
-      #   fromDatabase:
-      #     name: postgresql-rigid-17755
-      #     property: connectionString
-
-databases: # Render PostgreSQL database
-  # - name: postgresql-rigid-17755
-  #   ipAllowList: [] # only allow internal connections
