@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/gin-gonic/gin"
-	_ "github.com/heroku/x/hmetrics/onload"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 	"github.com/kiddikn/poicord/poicwater"
 	"github.com/kiddikn/poicord/server"
