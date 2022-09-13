@@ -33,7 +33,7 @@ func main() {
 		log.Fatal("database url must be set")
 	}
 
-	db, err := gorm.Open("postgres", dbu)
+	db, err := gorm.Open("mysql", dbu)
 	if err != nil {
 		log.Fatal("db connection error")
 	}
